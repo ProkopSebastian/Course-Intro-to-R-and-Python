@@ -1,0 +1,183 @@
+---
+title: "PDPRPy"
+subtitle: "Praca Domowa nr 1"
+author: "Sebastian Prokop"
+date: "2024-04-02"
+output: html_document
+---
+
+# Wstęp
+
+Omawiane zadanie polega na zrealizowaniu zapytania SQL na zbiorze danych stackexchange za pomocą paczki `sqldf` a następnie powtórzeniu tego samego zapytania na 3 kolejne sposoby:
+
+-   używając bazowych funkcji języka R (w szczególności takich jak merge i aggregate)
+
+-   używając paczki `dplyr`
+
+-   używając paczki `data.table`
+
+Rozwiązania będą porównywane czasowo z użyciem `microbenchmark` a ich równoważność będzie sprawdzana za pomocą `compare`.
+
+Testowany zbiór danych zawiera miedzy innymi informacje o postach, będących pytaniami i odpowiedziami, komentarzach oraz użytkownikach. Wczytywany zbiór jest częścią zbioru pochodzącego ze Stack Exchange Network.
+
+## Wczytanie funkcji rozwiązań i zbiorów danych
+
+```{r message=FALSE, warning=FALSE}
+# Wypisy (warnings, messages) przy wczytywaniu plików są w tym miejscu wyłączone
+# Wczytanie bibliotek
+library(sqldf)
+library(compare)
+library(dplyr)
+library(data.table)
+
+# Wczytanie rozwiązania
+source("Sebastian_Prokop_PD1.R")
+
+# Wczytanie danych
+Comments <- as.data.frame(read.csv("Comments.csv"))
+PostLinks <- as.data.frame(read.csv("PostLinks.csv"))
+Posts <- as.data.frame(read.csv("Posts.csv"))
+Users <- as.data.frame(read.csv("Users.csv"))
+```
+
+## Zapytanie 1
+
+### Wyjaśnienie zapytania
+
+Znajdź 10 najpopularniejszych lokalizacji autorów postów, czyli chcemy zobaczyć z jakich lokalizacji najczęściej są pisane posty.
+
+### Porównanie wyników - zgodność rozwiązań
+
+```{r}
+compare(sqldf_1(Posts, Users),
+        base_1(Posts, Users),
+        dplyr_1(Posts, Users),
+        data.table_1(Posts, Users))
+```
+
+### Porównanie rozwiązań czasowo
+
+```{r}
+microbenchmark::microbenchmark(
+  result.sql = sqldf_1(Posts, Users),
+  result.base = base_1(Posts, Users),
+  result.dplyr = dplyr_1(Posts, Users),
+  result.data.table = data.table_1(Posts, Users)
+)
+```
+
+## Zapytanie 2
+
+### Wyjaśnienie zapytania
+
+Znajdź posty, które są najczęściej linkowane / powiązane i pokaż liczbę połączeń, oraz tytuł. Wybieramy posty, które są pytaniami.
+
+### Porównanie wyników - zgodność rozwiązań
+
+```{r}
+compare(sqldf_2(Posts, PostLinks),
+        base_2(Posts, PostLinks),
+        dplyr_2(Posts, PostLinks),
+        data.table_2(Posts, PostLinks))
+```
+
+### Porównanie rozwiązań czasowo
+
+```{r}
+microbenchmark::microbenchmark(
+  result.sqldf = sqldf_2(Posts, PostLinks),
+  result.base = base_2(Posts, PostLinks),
+  result.dplyr = dplyr_2(Posts, PostLinks),
+  result.data.table = data.table_2(Posts, PostLinks)
+)
+```
+
+## Zapytanie 3
+
+### Wyjaśnienie zapytania
+
+Szukamy postów z najlepszym wskaźnikiem odpowiedzi, czyli takich, gdzie suma punktów zdobytych przez komentarze jest największa. Wybieramy 10 najlepszych pod tym względem postów i wyświetlamy szczegółowe informacje o nich, w tym dane o autorze.
+
+### Porównanie wyników - zgodność rozwiązań
+
+```{r}
+compare(sqldf_3(Comments, Posts, Users),
+        base_3(Comments, Posts, Users),
+        dplyr_3(Comments, Posts, Users),
+        data.table_3(Comments, Posts, Users))
+```
+
+### Porównanie rozwiązań czasowo
+
+```{r}
+microbenchmark::microbenchmark(
+  result.sqldf = sqldf_3(Comments, Posts, Users),
+  result.base = base_3(Comments, Posts, Users),
+  result.dplyr = dplyr_3(Comments, Posts, Users),
+  result.data.table = data.table_3(Comments, Posts, Users)
+)
+```
+
+## Zapytanie 4
+
+### Wyjaśnienie zapytania
+
+Szukamy pięciu użytkowników, którzy udzielili najwięcej odpowiedzi, jednocześnie mając na koncie więcej udzielonych odpowiedzi niż zadanych pytań. Wyświetlamy szczegółowe informacje o tych użytkownikach.
+
+### Porównanie wyników - zgodność rozwiązań
+
+```{r}
+compare(sqldf_4(Posts, Users),
+        base_4(Posts, Users),
+        dplyr_4(Posts, Users),
+        data.table_4(Posts, Users))
+```
+
+### Porównanie rozwiązań czasowo
+
+```{r}
+microbenchmark::microbenchmark(
+  result.sqldf = sqldf_4(Posts, Users),
+  result.base = base_4(Posts, Users),
+  result.dplyr = dplyr_4(Posts, Users),
+  result.data.table = data.table_4(Posts, Users)
+)
+```
+
+## Zapytanie 5
+
+### Wyjaśnienie zapytania
+
+Szukamy 10 użytkowników z największą średnią ilością odpowiedzi pod ich postami. Wyświetlamy informacje o tych użytkownikach, oraz obliczoną średnią.
+
+### Porównanie wyników - zgodność rozwiązań
+
+```{r}
+compare(sqldf_5(Posts, Users),
+        base_5(Posts, Users),
+        dplyr_5(Posts, Users),
+        data.table_5(Posts, Users))
+```
+
+### Porównanie rozwiązań czasowo
+
+```{r}
+microbenchmark::microbenchmark(
+  result.sqldf = sqldf_5(Posts, Users),
+  result.base = base_5(Posts, Users),
+  result.dplyr = dplyr_5(Posts, Users),
+  result.data.table = data.table_5(Posts, Users)
+)
+```
+
+# Podsumowanie
+
+Zapytania SQL można w R zrealizować najłatwiej za pomocą `sqldf` jednak jest to rozwiązanie najwolniejsze pod względem czasu wykonywania.
+
+Szybsze jest rozwiązanie za pomocą bazowego R.
+
+Z kolei szybsza od bazowego R jest paczka `dplyr`. Składnia jest bardzo czytelna, można korzystać z pewnego rodzaju pipeline-u, bez zbędnych przypisań.
+
+Najszybsze okazuje się być wykorzystanie `data.table`. Podobnie do `dplyr` jest czytelne i proste do pisania.
+
+Osobiście najlepiej pisało mi się używając `dplyr`.
