@@ -36,7 +36,8 @@ def solution_2(Posts, PostLinks):
     sol2 = sol2[sol2['PostTypeId'] == 1]
     # Poniższe sortowanie było odrobinę trudne do wychwycenia, bo jednakowe wartości 
     # w NumLinks pojawiają się dopiero w 19 wierszu. Oprócz sortowania po NumLinks
-    # Trzeba jeszcze dodać sortowanie po tytule alfabetycznie
+    # Trzeba jeszcze dodać sortowanie po tytule alfabetycznie, ale to i tak nie naprawia
+    # wszystkich problemów -  przy porównywaniu będzie jeszcze jedno sortowanie
     sol2 = sol2.sort_values(by = ['NumLinks', 'Title'], ascending = [False, True])
     sol2 = sol2[['Title', 'NumLinks']]
     sol2.reset_index(drop = True, inplace = True)

@@ -96,7 +96,7 @@ microbenchmark::microbenchmark(
 
 ### Wyjaśnienie zapytania
 
-Szukamy postów z najlepszym wskaźnikiem odpowiedzi, czyli takich, gdzie suma punktów zdobytych przez komentarze jest największa. Wybieramy 10 najlepszych pod tym względem postów i wyświetlamy szczegółowe informacje o nich, w tym dane o autorze.
+Szukamy pytań z najlepszym wskaźnikiem odpowiedzi, czyli takich, gdzie suma punktów zdobytych przez komentarze jest największa. Wybieramy 10 najlepszych pod tym względem postów i wyświetlamy szczegółowe informacje o nich, w tym dane o autorze.
 
 ### Porównanie wyników - zgodność rozwiązań
 
